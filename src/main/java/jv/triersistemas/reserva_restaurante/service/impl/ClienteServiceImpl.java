@@ -96,6 +96,12 @@ public class ClienteServiceImpl implements ClienteService {
 	public Page<ClienteDto> listarClientes(Pageable pageable, String searchTerm) {
 		return clienteRepositoryCustom.buscaPaginadaClientePorNome(pageable, searchTerm);
 	}
+	
+	@Override
+	public List<ClienteDto> buscarClientesComMaiorValorGasto() {
+		List<ClienteEntity> clientesMaiorValorGasto = clienteRepositoryCustom.buscarClientesComMaiorValorGasto();
+		return clientesMaiorValorGasto.stream().map(ClienteDto::new).toList();
+	}
 
 	public void validarIdade(ClienteDto cliente) {
 		LocalDate idadeMinima = LocalDate.now().minusYears(12);

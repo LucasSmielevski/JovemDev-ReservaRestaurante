@@ -56,7 +56,7 @@ public class ClienteEntity extends PessoaBase {
 		this.dataCadastro = Objects.requireNonNullElse(dto.getDataCadastro(), LocalDate.now());
 		this.quantidadeReservas = Objects.requireNonNullElse(dto.getQuantidadeReservas(), 0);
 		this.quantidadeValorGasto = Objects.requireNonNullElse(dto.getQuantidadeValorGasto(), BigDecimal.ZERO);
-		this.bloqueado = Objects.requireNonNullElse(dto.isBloqueado(), true);
+		this.bloqueado = Objects.requireNonNullElse(dto.isBloqueado(), false);
 	}
 
 	public ClienteEntity atualizaCliente(ClienteDto dto) {

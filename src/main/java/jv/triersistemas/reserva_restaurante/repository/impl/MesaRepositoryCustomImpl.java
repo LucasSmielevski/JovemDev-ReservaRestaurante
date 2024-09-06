@@ -29,6 +29,27 @@ public class MesaRepositoryCustomImpl implements MesaRepositoryCustom {
 	@Override
 	public List<MesaEntity> buscarMesasPorDataECapacidadePessoas(Long restauranteId, LocalDate data, Integer capacidadePessoas) {
 		var query = new JPAQuery<MesaEntity>(em);
+		
+	    // Subconsulta para verificar se há reservas agendadas para a data fornecida
+	    var subqueryAgendada = new JPAQuery<Void>(em);
+	    subqueryAgendada.select(reserva)
+	        .from(reserva)
+	        .where(
+	            reserva.mesa.id.eq(mesa.id)
+	            .and(reserva.dataReserva.eq(data))
+	            .and(reserva.status.eq(StatusEnum.AGENDADA))
+	        );
+
+	    // Subconsulta para verificar se há reservas canceladas para a data fornecida
+	    var subqueryCancelada = new JPAQuery<Void>(em);
+	    subqueryCancelada.select(reserva)
+	        .from(reserva)
+	        .where(
+	            reserva.mesa.id.eq(mesa.id)
+	            .and(reserva.dataReserva.eq(data))
+	            .and(reserva.status.eq(StatusEnum.CANCELADA))
+	        );
+			        
 
 		query.select(mesa).distinct()
 		.from(restaurante)
@@ -36,8 +57,9 @@ public class MesaRepositoryCustomImpl implements MesaRepositoryCustom {
 		.leftJoin(mesa.reservas, reserva)
 		.where(restaurante.id.eq(restauranteId)
 				.and(mesa.qntdPessoas.goe(capacidadePessoas))
-				.and(reserva.dataReserva.ne(data).or(reserva.dataReserva.isNull()))
-				.and(reserva.status.ne(StatusEnum.CANCELADA).or(reserva.status.isNull())));
+				 .and(subqueryAgendada.notExists()
+			                .or(subqueryCancelada.exists()
+			                .or(reserva.dataReserva.isNull()))));
 
 		return query.fetch();
 	}

@@ -19,5 +19,7 @@ public interface ClienteService {
 	ClienteDto desbloquearCliente(Long clienteId);
 	
 	Page<ClienteDto> listarClientes(Pageable pageable, String searchTerm);
+	
+	List<ClienteDto>  buscarClientesComMaiorValorGasto();
 
 }

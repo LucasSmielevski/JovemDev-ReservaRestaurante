@@ -26,9 +26,14 @@ public class ClienteController {
 
 	@GetMapping
 	public Page<ClienteDto> listarClientes(@RequestParam(defaultValue = "0", required = false) Integer page,
-											@RequestParam(defaultValue = "10", required = false) Integer size,
-											@RequestParam(required = false) String searchTerm){
+			@RequestParam(defaultValue = "10", required = false) Integer size,
+			@RequestParam(required = false) String searchTerm) {
 		return clienteService.listarClientes(Pageable.ofSize(size).withPage(page), searchTerm);
+	}
+
+	@GetMapping("/maiorValor")
+	public List<ClienteDto> buscarClientesComMaiorValorGasto() {
+		return clienteService.buscarClientesComMaiorValorGasto();
 	}
 
 	@PostMapping
@@ -40,14 +45,14 @@ public class ClienteController {
 	public ClienteDto atualizarCliente(@PathVariable Long id, @RequestBody ClienteDto clienteAtualizado) {
 		return clienteService.atualizarCliente(id, clienteAtualizado);
 	}
-	
-    @PutMapping("/desbloquear/{id}")
-    public ClienteDto desbloquearCliente(@PathVariable Long id) {
-        return clienteService.desbloquearCliente(id);
-    }
-    
-    @PutMapping("/bloquear/{id}")
-    public ClienteDto bloquearCliente(@PathVariable Long id) {
-        return clienteService.bloquearCliente(id);
-    }
+
+	@PutMapping("/desbloquear/{id}")
+	public ClienteDto desbloquearCliente(@PathVariable Long id) {
+		return clienteService.desbloquearCliente(id);
+	}
+
+	@PutMapping("/bloquear/{id}")
+	public ClienteDto bloquearCliente(@PathVariable Long id) {
+		return clienteService.bloquearCliente(id);
+	}
 }

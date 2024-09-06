@@ -1,6 +1,7 @@
 package jv.triersistemas.reserva_restaurante.repository.impl;
 
 
+import java.util.List;
 import java.util.Objects;
 
 import org.springframework.data.domain.Page;
@@ -15,6 +16,7 @@ import com.querydsl.jpa.impl.JPAQuery;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jv.triersistemas.reserva_restaurante.dto.ClienteDto;
+import jv.triersistemas.reserva_restaurante.entity.ClienteEntity;
 import jv.triersistemas.reserva_restaurante.entity.QClienteEntity;
 import jv.triersistemas.reserva_restaurante.entity.QMesaEntity;
 import jv.triersistemas.reserva_restaurante.entity.QReservaEntity;
@@ -52,6 +54,19 @@ public class ClienteRepositoryCustomImpl implements ClienteRepositoryCustom{
 		query.offset(pageable.getOffset());
 		
 		return new PageImpl<ClienteDto>(query.fetch(), pageable, query.fetchCount());
+	}
+
+	@Override
+	public List<ClienteEntity> buscarClientesComMaiorValorGasto() {
+		var query = new JPAQuery<ClienteEntity>(em);
+
+         	query
+            .select(cliente)
+            .from(cliente)
+            .orderBy(cliente.quantidadeValorGasto.desc(), cliente.id.asc())
+            .fetch();
+
+        return query.fetch();
 	}
 
 }
