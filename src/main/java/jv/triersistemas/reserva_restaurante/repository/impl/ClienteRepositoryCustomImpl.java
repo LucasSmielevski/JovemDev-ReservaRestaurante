@@ -21,6 +21,7 @@ import jv.triersistemas.reserva_restaurante.entity.QClienteEntity;
 import jv.triersistemas.reserva_restaurante.entity.QMesaEntity;
 import jv.triersistemas.reserva_restaurante.entity.QReservaEntity;
 import jv.triersistemas.reserva_restaurante.entity.QRestauranteEntity;
+import jv.triersistemas.reserva_restaurante.enums.StatusEnum;
 import jv.triersistemas.reserva_restaurante.repository.ClienteRepositoryCustom;
 
 @Repository
@@ -67,6 +68,21 @@ public class ClienteRepositoryCustomImpl implements ClienteRepositoryCustom{
             .fetch();
 
         return query.fetch();
+	}
+
+	@Override
+	public List<ClienteEntity> buscarClientesComMaisReservasConcluidas() {
+		
+		var query = new JPAQuery<ClienteEntity>(em);
+		
+		query.select(cliente).from(reserva)
+		.join(reserva.cliente, cliente)
+		.where(reserva.status.eq(StatusEnum.CONCLUIDA))
+		.groupBy(cliente.id)
+		.orderBy(reserva.count().desc())
+		.fetch();
+		
+		return query.fetch();
 	}
 
 }

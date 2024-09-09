@@ -6,6 +6,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import jv.triersistemas.reserva_restaurante.dto.ClienteDto;
+import jv.triersistemas.reserva_restaurante.entity.ClienteEntity;
 
 public interface ClienteService {
 	ClienteDto adicionarCliente(ClienteDto novoCliente);
@@ -17,6 +18,8 @@ public interface ClienteService {
 	ClienteDto bloquearCliente(Long clienteId);
 
 	ClienteDto desbloquearCliente(Long clienteId);
+	
+	List<ClienteDto> buscarClientesComMaisReservasConcluidas();
 	
 	Page<ClienteDto> listarClientes(Pageable pageable, String searchTerm);
 	

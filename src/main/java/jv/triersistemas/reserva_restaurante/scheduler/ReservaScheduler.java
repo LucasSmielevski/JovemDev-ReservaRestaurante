@@ -17,7 +17,7 @@ public class ReservaScheduler {
 
 //	@Scheduled(cron = "0 0 6 * * *")
 	@Transactional
-	@Scheduled(initialDelay = 3000, fixedDelay = 1000*5*60)
+	@Scheduled(initialDelay = 3000, fixedDelay = 1000*10*60)
 	public void concluirReservaNaoFinalizada() {
 		log.info("Atualizando Reservas");
 		reservaService.concluirReservaNaoFinalizada();

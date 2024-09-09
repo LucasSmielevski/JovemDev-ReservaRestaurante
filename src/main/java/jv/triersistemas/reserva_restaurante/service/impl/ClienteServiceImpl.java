@@ -102,6 +102,12 @@ public class ClienteServiceImpl implements ClienteService {
 		List<ClienteEntity> clientesMaiorValorGasto = clienteRepositoryCustom.buscarClientesComMaiorValorGasto();
 		return clientesMaiorValorGasto.stream().map(ClienteDto::new).toList();
 	}
+	
+	@Override
+	public List<ClienteDto> buscarClientesComMaisReservasConcluidas() {
+		List<ClienteEntity> clientes = clienteRepositoryCustom.buscarClientesComMaisReservasConcluidas();
+		return clientes.stream().map(ClienteDto::new).toList();
+	}
 
 	public void validarIdade(ClienteDto cliente) {
 		LocalDate idadeMinima = LocalDate.now().minusYears(12);

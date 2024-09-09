@@ -14,4 +14,6 @@ public interface ClienteRepositoryCustom {
 	Page<ClienteDto> buscaPaginadaClientePorNome(Pageable pageable, String searchTerm);
 	
 	List<ClienteEntity> buscarClientesComMaiorValorGasto();
+	
+	 List<ClienteEntity> buscarClientesComMaisReservasConcluidas();
 }

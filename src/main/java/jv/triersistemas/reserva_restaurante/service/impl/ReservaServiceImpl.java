@@ -1,23 +1,23 @@
 package jv.triersistemas.reserva_restaurante.service.impl;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import jv.triersistemas.reserva_restaurante.dto.ClienteDto;
+import jakarta.persistence.EntityNotFoundException;
 import jv.triersistemas.reserva_restaurante.dto.ReservaDto;
 import jv.triersistemas.reserva_restaurante.entity.ClienteEntity;
 import jv.triersistemas.reserva_restaurante.entity.MesaEntity;
+import jv.triersistemas.reserva_restaurante.entity.PedidoEntity;
 import jv.triersistemas.reserva_restaurante.entity.ReservaEntity;
 import jv.triersistemas.reserva_restaurante.enums.StatusEnum;
 import jv.triersistemas.reserva_restaurante.repository.ClienteRepository;
 import jv.triersistemas.reserva_restaurante.repository.MesaRepository;
 import jv.triersistemas.reserva_restaurante.repository.ReservaRepository;
-import jv.triersistemas.reserva_restaurante.service.ClienteService;
 import jv.triersistemas.reserva_restaurante.service.ReservaService;
 
 @Service
@@ -68,28 +68,29 @@ public class ReservaServiceImpl implements ReservaService {
 			validaReservaCancelada(status, reservaEntity.get().getDataReserva());
 			reservaEntity.get().atualizarStatus(status);
 			var entidadePersistida = repository.save(reservaEntity.get());
+			adicionarQuantidadeGastoENumReservas(id);
 			return new ReservaDto(entidadePersistida);
 		}
+		
 		return null;
-
 	}
-	
+
 	@Override
 	public void concluirReservaNaoFinalizada() {
 		List<ReservaEntity> listaReservas = repository.findByStatus(StatusEnum.AGENDADA);
 		for (ReservaEntity reserva : listaReservas) {
-			if(reserva.getDataReserva().isBefore(LocalDate.now())) {
-				if(reserva.getPedidos().isEmpty()) {
+			if (reserva.getDataReserva().isBefore(LocalDate.now())) {
+				if (reserva.getPedidos().isEmpty()) {
 					reserva.setStatus(StatusEnum.INADIPLENTE);
 					reserva.setObservacao("Reserva finalizada automaticamente pelo sistema");
-				}else {
+				} else {
 					reserva.setStatus(StatusEnum.CONCLUIDA);
 					reserva.setObservacao("Reserva finalizada automaticamente pelo sistema");
 				}
 				repository.save(reserva);
 			}
 		}
-		
+
 	}
 
 	public void validaDataReserva(ReservaDto reserva) {
@@ -114,6 +115,22 @@ public class ReservaServiceImpl implements ReservaService {
 
 	}
 
+	public void adicionarQuantidadeGastoENumReservas(Long id) {
+		ReservaEntity reserva = repository.findById(id)
+				.orElseThrow(() -> new EntityNotFoundException("Reserva não encontrada"));
+
+		if (reserva.getStatus() == StatusEnum.CONCLUIDA) {
+			BigDecimal totalPedidos = reserva.getPedidos().stream().map(PedidoEntity::getValor).reduce(BigDecimal.ZERO,
+					BigDecimal::add);
+
+			ClienteEntity cliente = reserva.getCliente();
+			cliente.setQuantidadeValorGasto(cliente.getQuantidadeValorGasto().add(totalPedidos));
+			cliente.setQuantidadeReservas(cliente.getQuantidadeReservas() + 1);
+
+			clienteRepository.save(cliente);
+		}
+	}
+
 	public boolean verificaQuantidadeDeReservasCanceladas(Long clienteId) {
 		List<ReservaEntity> reservasCanceladas = repository.findByClienteIdAndStatus(clienteId, StatusEnum.CANCELADA);
 
@@ -126,11 +143,11 @@ public class ReservaServiceImpl implements ReservaService {
 	}
 
 	public void verificarInadimplenciaCliente(ClienteEntity cliente) {
-        ClienteEntity clienteInadimplente = clienteRepository.findById(cliente.getId()).orElseThrow();
-        if(clienteInadimplente.isBloqueado()){
-        	throw new IllegalArgumentException("Este cliente está bloqueado pois possui 3 inadimplências, pagar taxa para desbloqueio");
-        }
-    }
-
+		ClienteEntity clienteInadimplente = clienteRepository.findById(cliente.getId()).orElseThrow();
+		if (clienteInadimplente.isBloqueado()) {
+			throw new IllegalArgumentException(
+					"Este cliente está bloqueado pois possui 3 inadimplências, pagar taxa para desbloqueio");
+		}
+	}
 
 }

@@ -35,6 +35,11 @@ public class ClienteController {
 	public List<ClienteDto> buscarClientesComMaiorValorGasto() {
 		return clienteService.buscarClientesComMaiorValorGasto();
 	}
+	
+	@GetMapping("/maisReservasConcluidas")
+	public List<ClienteDto> buscarClientesComMaisReservasConcluidas(){
+		return clienteService.buscarClientesComMaisReservasConcluidas();
+	}
 
 	@PostMapping
 	public ClienteDto adicionarCliente(@RequestBody ClienteDto clienteDto) {
