@@ -8,6 +8,8 @@ public interface RestauranteService {
 	RestauranteDto adicionarRestaurante(RestauranteDto novoRestaurante);
 	
 	List<RestauranteDto> getTodosRestaurantes();
+	
+	RestauranteDto obterRestaurantePorId(Long id);
 
 	RestauranteDto atualizarRestaurante(Long id, RestauranteDto restauranteAtualizado);
 }

@@ -3,6 +3,7 @@ package jv.triersistemas.reserva_restaurante.service.impl;
 import java.util.List;
 import java.util.Optional;
 
+import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -28,7 +29,23 @@ public class RestauranteServiceImpl implements RestauranteService {
 	@Override
 	public List<RestauranteDto> getTodosRestaurantes() {
 		List<RestauranteEntity> listaRestaurantes = repository.findAll();
+
+		for (RestauranteEntity restaurante : listaRestaurantes) {
+			Hibernate.initialize(restaurante.getClientes());
+		}
+
 		return listaRestaurantes.stream().map(RestauranteDto::new).toList();
+	}
+	
+	@Override
+	public RestauranteDto obterRestaurantePorId(Long id) {
+		Optional<RestauranteEntity> restauranteOpt = repository.findById(id);
+		if (restauranteOpt.isPresent()) {
+			RestauranteEntity restaurante = restauranteOpt.get();
+			Hibernate.initialize(restaurante.getClientes());
+			return new RestauranteDto(restaurante);
+		}
+		return null;
 	}
 
 	@Override
@@ -45,5 +62,6 @@ public class RestauranteServiceImpl implements RestauranteService {
 	public String limparCnpj(String cnpj) {
 		return cnpj.replaceAll("[^\\d]", "");
 	}
+
 
 }
